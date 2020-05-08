@@ -1,5 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
+const devMode = process.env.NODE_ENV === 'development';
 
 module.exports = {
   entry: {
@@ -15,13 +17,24 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          'style-loader',
-          'css-loader'
+          devMode ? 'style-loader' : {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              hmr: devMode,  
+              reloadAll: true,
+            }
+          },
+          { loader: 'css-loader' }
         ]
       },
       {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: 'file-loader',
+        test: /\.(png|svg|jp(e?)g|gif|svg)$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: "assets/images/[name].[ext]"
+          }
+        }
       },
       {
         test: /\.js$/,
@@ -39,14 +52,17 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'src/index.html',
       inject: 'body',
-      filename: 'index.html'
-    })
+      filename: 'index.html',
+      minify: devMode ? false : { collapseWhitespace: true, minifyCSS: true },
+      development: devMode ? '<div id="dev-mode"></div>' : ''
+    }),
+    new MiniCssExtractPlugin({
+        filename: devMode ? '[name].css' : '[name].[hash].css',
+        chunkFilename: devMode ? '[id].css' : '[id].[hash].css'
+    }),
   ],
   devServer: {
-    contentBase: [
-      path.join(__dirname, 'public'),
-      path.join(__dirname, 'assets')
-    ],
+    contentBase: path.join(__dirname, 'public'),
     compress: true,
     port: 3000,
     historyApiFallback: true
