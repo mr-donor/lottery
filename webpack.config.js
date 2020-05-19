@@ -39,12 +39,14 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-env', '@babel/preset-react'],
+            }
           }
-        }
+        ]
       }
     ]
   },
@@ -54,12 +56,12 @@ module.exports = {
       inject: 'body',
       filename: 'index.html',
       minify: devMode ? false : { collapseWhitespace: true, minifyCSS: true },
-      development: devMode ? '<div id="dev-mode"></div>' : ''
+      csp: devMode ? '' : '<meta http-equiv="Content-Security-Policy" content="script-src \'self\' \'unsafe-inline\';" />'
     }),
     new MiniCssExtractPlugin({
         filename: devMode ? '[name].css' : '[name].[hash].css',
         chunkFilename: devMode ? '[id].css' : '[id].[hash].css'
-    }),
+    })
   ],
   devServer: {
     contentBase: path.join(__dirname, 'public'),

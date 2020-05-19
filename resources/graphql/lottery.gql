@@ -1,0 +1,27 @@
+type Query {
+    user: User
+}
+
+type Mutation {
+    logout: String
+    login(user: UserInput!): LoginResponse
+}
+
+type User {
+    username: String!
+    password: String
+}
+
+input UserInput {
+    username: String!
+    password: String!
+}
+
+enum LoginResponse {
+    WrongPassword
+    Overloading
+    Ok
+    WebSocketFailed
+    HeavyLogin
+    WhereAmI
+}
